@@ -9,15 +9,14 @@ const BUFS_PER_SEC = 5
 const SAMPLES_PER_BUF = Math.floor(SAMPLE_RATE / BUFS_PER_SEC)
 
 async function test() {
-  const decoder = new Decoder()
-  const decoderWasm = new DecoderWasm()
-
   const sdr = await RtlSdr.requestDevice()
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(SAMPLE_RATE)
   await sdr.setCenterFrequency(88.7 * 1e6)
   await sdr.resetBuffer()
 
+  const decoder = new Decoder()
+  const decoderWasm = new DecoderWasm()
   for (const mode of ['FM', 'NFM', 'AM', 'LSB', 'USB']) {
     decoder.setMode(mode)
     decoderWasm.setMode(mode)
