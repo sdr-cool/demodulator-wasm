@@ -18,7 +18,7 @@ async function test() {
   const decoder = new Decoder()
   for (const mode of ['FM', 'NFM', 'AM', 'LSB', 'USB']) {
     decoder.setMode(mode)
-    if (mode === 'AM') decoderWasm.setMode(mode)
+    if (decoderWasm.hasMode(mode)) decoderWasm.setMode(mode)
 
     let dataProcessed = 0
     let costDecoder = 0
@@ -27,7 +27,7 @@ async function test() {
       const samples = await sdr.readSamples(SAMPLES_PER_BUF)
       dataProcessed += samples.byteLength
 
-      if (mode === 'AM') {
+      if (decoderWasm.hasMode(mode)) {
         const dsw = Date.now()
         decoderWasm.demodulate(samples, true, 0)
         costDecoderWasm += Date.now() - dsw

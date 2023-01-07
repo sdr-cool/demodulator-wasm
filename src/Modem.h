@@ -18,10 +18,10 @@ public:
   Modem() : aOutputCeil(1), aOutputCeilMA(1), aOutputCeilMAA(1) {}
   virtual ~Modem() {}
   virtual size_t get_resample_size(size_t len) = 0;
-  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) = 0;
+  virtual size_t demodulate(const unsigned char *raw, size_t len, std::vector<float>& out) = 0;
 
 protected:
-  void init_input(const char *raw, size_t len) {
+  void init_input(const unsigned char *raw, size_t len) {
     iq_data.resize(len / 2);
     for (size_t idx = 0; idx < len; idx += 2) {
       iq_data[idx / 2].real = float(raw[idx]) / 128 - 0.995;
@@ -64,10 +64,10 @@ public:
     return resampler.get_resample_size(len);
   }
 
-  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) {
+  virtual size_t demodulate(const unsigned char *raw, size_t len, std::vector<float>& out) {
     init_input(raw, len);
     demod_out.resize(iq_data.size());
-    
+
     for (size_t idx = 0; idx < len; idx++) {
       const float I = iq_data[idx].real;
       const float Q = iq_data[idx].imag;
@@ -100,7 +100,7 @@ public:
     return resampler.get_resample_size(len);
   }
 
-  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) {
+  virtual size_t demodulate(const unsigned char *raw, size_t len, std::vector<float>& out) {
     init_input(raw, len);
     demod_out.resize(iq_data.size());
 

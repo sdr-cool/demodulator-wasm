@@ -8,7 +8,7 @@ size_t SAMPLE_RATE = 1024 * 1e3;
 size_t AUDIO_SAMPLE_RATE = 48 * 1e3;
 Modem *g_modem = NULL;
 
-std::vector<char> g_in;
+std::vector<unsigned char> g_in;
 std::vector<float> g_out;
 
 extern "C" {
