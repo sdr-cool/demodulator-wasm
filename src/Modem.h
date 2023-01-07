@@ -6,6 +6,8 @@
 
 class Modem {
 public:
+  virtual ~Modem() {}
+  virtual size_t get_resample_size(size_t len) = 0;
   virtual size_t demodulate(const char *raw, size_t len, float *out) = 0;
 };
 
@@ -21,6 +23,10 @@ public:
   }
 
   ~ModemAM() {
+  }
+
+  virtual size_t get_resample_size(size_t len) {
+    return resampler.get_resample_size(len);
   }
 
   virtual size_t demodulate(const char *raw, size_t len, float *out) {

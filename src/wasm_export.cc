@@ -29,11 +29,16 @@ extern "C" {
     switch (mode)
     {
     case 1:
+      if (g_modem) delete g_modem;
       g_modem = new ModemAM(AUDIO_SAMPLE_RATE, SAMPLE_RATE);
       break;  
     default:
       break;
     }
+  }
+
+  EMSCRIPTEN_KEEPALIVE void *create_demodulate_out_ptr(size_t len) {
+    return malloc(g_modem->get_resample_size(len));
   }
 
   EMSCRIPTEN_KEEPALIVE size_t demodulate(const char *raw, size_t len, float *out) {

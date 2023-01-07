@@ -51,7 +51,7 @@ public:
   }
 
   size_t get_resample_size(size_t len) {
-    return (size_t)ceil((double)(len) * audio_resample_ratio) + 512;
+    return (size_t)ceil((double)(len) * audio_resample_ratio);
   }
 
   size_t resample(float *demod_out, size_t demod_out_len, float *out) {

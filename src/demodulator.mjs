@@ -14,7 +14,7 @@ export default {
 
   demodulate(buffer) {
     const ptr = bufferToPtr(buffer)
-    const out = demodulator._createPtr(1024 * 24);
+    const out = demodulator._create_demodulate_out_ptr(buffer.byteLength / 4);
     const outLen = demodulator._demodulate(ptr, buffer.byteLength, out)
 
     const outBuffer = new ArrayBuffer(outLen * 4)
