@@ -5,54 +5,28 @@
 #include "utils.h"
 
 class Modem {
-public:
-  virtual ~Modem() {}
-  virtual size_t get_resample_size(size_t len) = 0;
-  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) = 0;
-};
-
-class ModemAM : public Modem {
 private:
-  std::vector<float> iq_data;
-  std::vector<float> demod_out;
-  DcBlock dc;
-  AudioResampler resampler;
   float aOutputCeil;
   float aOutputCeilMA;
   float aOutputCeilMAA;
 
+protected:
+  std::vector<liquid_float_complex> iq_data;
+  std::vector<float> demod_out;
 
 public:
-  ModemAM(size_t audio_samplerate, size_t samplerate):
-    dc(25, 30.0f), resampler(audio_samplerate, samplerate),
-    aOutputCeil(1), aOutputCeilMA(1), aOutputCeilMAA(1) {
-  }
+  Modem() : aOutputCeil(1), aOutputCeilMA(1), aOutputCeilMAA(1) {}
+  virtual ~Modem() {}
+  virtual size_t get_resample_size(size_t len) = 0;
+  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) = 0;
 
-  ~ModemAM() {
-  }
-
-  virtual size_t get_resample_size(size_t len) {
-    return resampler.get_resample_size(len);
-  }
-
-  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) {
-    if (iq_data.size() < len) iq_data.resize(len);
-    fill_iq(raw, &iq_data[0], len);
-
-    size_t demod_out_len = len / 2;
-    if (demod_out.size() < demod_out_len) demod_out.resize(demod_out_len);
-    
+protected:
+  void init_input(const char *raw, size_t len) {
+    iq_data.resize(len / 2);
     for (size_t idx = 0; idx < len; idx += 2) {
-      const float I = iq_data[idx];
-      const float Q = iq_data[idx + 1];
-      dc.push(sqrt(I * I + Q * Q));
-      dc.execute(&demod_out[idx / 2]);
+      iq_data[idx / 2].real = float(raw[idx]) / 128 - 0.995;
+      iq_data[idx / 2].imag = float(raw[idx + 1]) / 128 - 0.995;
     }
-
-    auto_gain(&demod_out[0], demod_out_len);
-    size_t out_len = get_resample_size(demod_out_len);
-    if (out.size() < out_len) out.resize(out_len);
-    return resampler.resample(&demod_out[0], demod_out_len, &out[0]);  
   }
 
   void auto_gain(float *demod_out, const size_t len) {
@@ -71,5 +45,70 @@ public:
     for (size_t i = 0; i < len; i++) {
         demod_out[i] *= gain;
     }
+  }
+};
+
+class ModemAM : public Modem {
+private:
+  DcBlock dc;
+  AudioResampler resampler;
+
+public:
+  ModemAM(size_t audio_samplerate, size_t samplerate): dc(25, 30.0f), resampler(audio_samplerate, samplerate) {
+  }
+
+  ~ModemAM() {
+  }
+
+  virtual size_t get_resample_size(size_t len) {
+    return resampler.get_resample_size(len);
+  }
+
+  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) {
+    init_input(raw, len);
+    demod_out.resize(iq_data.size());
+    
+    for (size_t idx = 0; idx < len; idx++) {
+      const float I = iq_data[idx].real;
+      const float Q = iq_data[idx].imag;
+      dc.push(sqrt(I * I + Q * Q));
+      dc.execute(&demod_out[idx]);
+    }
+
+    auto_gain(&demod_out[0], demod_out.size());
+    size_t out_len = get_resample_size(demod_out.size());
+    if (out.size() < out_len) out.resize(out_len);
+    return resampler.resample(&demod_out[0], demod_out.size(), &out[0]);
+  }
+};
+
+class ModemNFM : public Modem {
+private:
+  freqdem fm_dem;
+  AudioResampler resampler;
+
+public:
+  ModemNFM(size_t audio_samplerate, size_t samplerate): resampler(audio_samplerate, samplerate) {
+    fm_dem = freqdem_create(0.5f);
+  }
+
+  ~ModemNFM() {
+    freqdem_destroy(fm_dem);
+  }
+
+  virtual size_t get_resample_size(size_t len) {
+    return resampler.get_resample_size(len);
+  }
+
+  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) {
+    init_input(raw, len);
+    demod_out.resize(iq_data.size());
+
+    int ret = freqdem_demodulate_block(fm_dem, &iq_data[0], iq_data.size(), &demod_out[0]);
+    
+    // auto_gain(&demod_out[0], demod_out.size());
+    size_t out_len = get_resample_size(demod_out.size());
+    if (out.size() < out_len) out.resize(out_len);
+    return resampler.resample(&demod_out[0], demod_out.size(), &out[0]);
   }
 };

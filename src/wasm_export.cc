@@ -21,12 +21,16 @@ extern "C" {
   }
 
   EMSCRIPTEN_KEEPALIVE void set_mode(int mode) {
+    if (g_modem) delete g_modem;
     switch (mode)
     {
     case 1:
-      if (g_modem) delete g_modem;
       g_modem = new ModemAM(AUDIO_SAMPLE_RATE, SAMPLE_RATE);
-      break;  
+      break;
+    case 2:
+      g_modem = new ModemNFM(AUDIO_SAMPLE_RATE, SAMPLE_RATE);
+      break;
+
     default:
       break;
     }

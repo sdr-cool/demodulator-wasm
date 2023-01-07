@@ -6,10 +6,14 @@ function bufferToPtr(buffer) {
   return ptr;
 }
 
-const modeMap = { 'AM': 1 }
+const modeMap = { 'AM': 1, 'NFM': 2 }
 export default {
   setMode(mode) {
     demodulator._set_mode(modeMap[mode])
+  },
+
+  hasMode(mode) {
+    return modeMap[mode] >= 0
   },
 
   demodulate(buffer) {
