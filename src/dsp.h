@@ -5,6 +5,16 @@
 #include <cstdint>
 #include <vector>
 
+#include <iostream>
+template<class ITER> void debug_view(ITER begin, size_t len = 8) {
+  auto end = begin + len;
+  while (begin != end)
+  {
+    std::cout << *begin++ << " ";
+  }
+  std::cout << std::endl;
+}
+
 class Demodulator {
 public:
   virtual ~Demodulator() {}
@@ -88,18 +98,21 @@ public:
   }
 
   void downsample(const std::vector<float>& samples, std::vector<float> &outArr) {
+    // debug_view(samples.begin());
+
     filter.loadSamples(samples);
     outArr.resize(samples.size() / rateMul);
     double readFrom = 0.0;
     for (int i = 0; i < outArr.size(); ++i, readFrom += rateMul) {
       outArr[i] = filter.get(size_t(readFrom));
     }
+    // debug_view(outArr.begin());
   }
 };
 
 std::vector<float> getLowPassFIRCoeffs(size_t sampleRate, size_t halfAmplFreq, size_t length) {
   length += (length + 1) % 2;
-  double freq = halfAmplFreq / sampleRate;
+  double freq = double(halfAmplFreq) / double(sampleRate);
   std::vector<float> coefs(length);
   size_t center = length / 2;
   double sum = 0;
