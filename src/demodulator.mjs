@@ -1,7 +1,7 @@
 import { default  as demodulator } from './demodulator_wasm.js'
 
 function bufferToPtr(buffer) {
-  const ptr = demodulator._createPtr(buffer.byteLength)
+  const ptr = demodulator._init_in(buffer.byteLength)
   new Uint8Array(demodulator.HEAP8.buffer, ptr).set(new Uint8Array(buffer))
   return ptr;
 }
@@ -14,14 +14,12 @@ export default {
 
   demodulate(buffer) {
     const ptr = bufferToPtr(buffer)
-    const out = demodulator._create_demodulate_out_ptr(buffer.byteLength / 4);
+    const out = demodulator._get_out_ptr();
     const outLen = demodulator._demodulate(ptr, buffer.byteLength, out)
 
     const outBuffer = new ArrayBuffer(outLen * 4)
     new Uint8Array(outBuffer).set(new Uint8Array(demodulator.HEAP8.buffer, out, outLen * 4))
 
-    demodulator._freePtr(out)
-    demodulator._freePtr(ptr)
     return outBuffer
   }
 }

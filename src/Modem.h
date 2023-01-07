@@ -8,7 +8,7 @@ class Modem {
 public:
   virtual ~Modem() {}
   virtual size_t get_resample_size(size_t len) = 0;
-  virtual size_t demodulate(const char *raw, size_t len, float *out) = 0;
+  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) = 0;
 };
 
 class ModemAM : public Modem {
@@ -35,7 +35,7 @@ public:
     return resampler.get_resample_size(len);
   }
 
-  virtual size_t demodulate(const char *raw, size_t len, float *out) {
+  virtual size_t demodulate(const char *raw, size_t len, std::vector<float>& out) {
     if (iq_data.size() < len) iq_data.resize(len);
     fill_iq(raw, &iq_data[0], len);
 
@@ -50,7 +50,9 @@ public:
     }
 
     auto_gain(&demod_out[0], demod_out_len);
-    return resampler.resample(&demod_out[0], demod_out_len, out);  
+    size_t out_len = get_resample_size(demod_out_len);
+    if (out.size() < out_len) out.resize(out_len);
+    return resampler.resample(&demod_out[0], demod_out_len, &out[0]);  
   }
 
   void auto_gain(float *demod_out, const size_t len) {
