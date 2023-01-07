@@ -68,7 +68,7 @@ public:
     init_input(raw, len);
     demod_out.resize(iq_data.size());
 
-    for (size_t idx = 0; idx < len; idx++) {
+    for (size_t idx = 0; idx < iq_data.size(); idx++) {
       const float I = iq_data[idx].real;
       const float Q = iq_data[idx].imag;
       dc.push(sqrt(I * I + Q * Q));
