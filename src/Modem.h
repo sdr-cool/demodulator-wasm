@@ -17,9 +17,15 @@ private:
   std::vector<float> demod_out;
   DcBlock dc;
   AudioResampler resampler;
+  float aOutputCeil;
+  float aOutputCeilMA;
+  float aOutputCeilMAA;
+
 
 public:
-  ModemAM(size_t audio_samplerate, size_t samplerate): dc(25, 30.0f), resampler(audio_samplerate, samplerate) {
+  ModemAM(size_t audio_samplerate, size_t samplerate):
+    dc(25, 30.0f), resampler(audio_samplerate, samplerate),
+    aOutputCeil(1), aOutputCeilMA(1), aOutputCeilMAA(1) {
   }
 
   ~ModemAM() {
@@ -43,6 +49,25 @@ public:
       dc.execute(&demod_out[idx / 2]);
     }
 
+    auto_gain(&demod_out[0], demod_out_len);
     return resampler.resample(&demod_out[0], demod_out_len, out);  
+  }
+
+  void auto_gain(float *demod_out, const size_t len) {
+    aOutputCeilMA = aOutputCeilMA + (aOutputCeil - aOutputCeilMA) * 0.025f;
+    aOutputCeilMAA = aOutputCeilMAA + (aOutputCeilMA - aOutputCeilMAA) * 0.025f;
+    aOutputCeil = 0;
+    
+    for (size_t i = 0; i < len; i++) {
+        if (demod_out[i] > aOutputCeil) {
+            aOutputCeil = demod_out[i];
+        }
+    }
+    
+    float gain = 0.5f / aOutputCeilMAA;
+    
+    for (size_t i = 0; i < len; i++) {
+        demod_out[i] *= gain;
+    }
   }
 };
