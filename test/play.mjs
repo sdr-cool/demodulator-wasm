@@ -25,15 +25,15 @@ async function play() {
   await sdr.resetBuffer()
 
   const decoder = new Decoder()
-  decoder.setMode('NFM');
-  decoderWasm.setMode('NFM');
+  decoder.setMode('USB');
+  decoderWasm.setMode('USB');
   while (sdr) {
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
     setImmediate(() => {
       // const s = Date.now()
       if (process.env.WASM) {
-        const audio = decoderWasm.demodulate(samples)
-        writeToStdout(audio, audio)
+        const [left, right] = decoderWasm.demodulate(samples)
+        writeToStdout(left, right)
       } else {
         const [left, right] = decoder.process(samples, true, 0)
         writeToStdout(left, right)

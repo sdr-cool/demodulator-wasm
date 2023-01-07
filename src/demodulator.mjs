@@ -3,10 +3,17 @@ import { default  as demodulator } from './demodulator_wasm.js'
 function bufferToPtr(buffer) {
   const ptr = demodulator._init_in(buffer.byteLength)
   new Uint8Array(demodulator.HEAP8.buffer, ptr).set(new Uint8Array(buffer))
-  return ptr;
+  return ptr
 }
 
-const modeMap = { 'AM': 1, 'NFM': 2 }
+function ptrToBuffer(ptr, bytes) {
+  const out = new ArrayBuffer(bytes)
+  new Uint8Array(out).set(new Uint8Array(demodulator.HEAP8.buffer, ptr, bytes))
+  return out
+}
+
+// const modeMap = { 'AM': 1, 'NFM': 2 }
+const modeMap = { 'USB': 3, 'LSB': 4 }
 export default {
   setMode(mode) {
     demodulator._set_mode(modeMap[mode])
@@ -17,13 +24,12 @@ export default {
   },
 
   demodulate(buffer) {
-    const ptr = bufferToPtr(buffer)
-    const out = demodulator._get_out_ptr();
-    const outLen = demodulator._demodulate(ptr, buffer.byteLength, out)
+    bufferToPtr(buffer)
+    const outLen = demodulator._process(buffer.byteLength)
 
-    const outBuffer = new ArrayBuffer(outLen * 4)
-    new Uint8Array(outBuffer).set(new Uint8Array(demodulator.HEAP8.buffer, out, outLen * 4))
+    const left = ptrToBuffer(demodulator._get_left(), outLen * 4)
+    const right = ptrToBuffer(demodulator._get_right(), outLen * 4)
 
-    return outBuffer
+    return [left, right]
   }
 }
