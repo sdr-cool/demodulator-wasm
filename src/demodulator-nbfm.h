@@ -106,7 +106,6 @@ public:
   }
 
   virtual double getRelSignalLevel() {
-    return 0;
-    // return pow(demodulator.getRelSignalPower(), 0.17);
+    return pow(demodulator.getRelSignalPower(), 0.17);
   }
 };
