@@ -9,12 +9,13 @@
 double SAMPLERATE = 1024 * 1e3;
 double AUDIO_SAMPLERATE = 48 * 1e3;
 
+int g_mode;
 std::vector<uint8_t> in;
 std::vector<float> out_left;
 std::vector<float> out_right;
 
 double cosine = 1, sine = 0;
-Demodulator *demodulator;
+Demodulator *demodulator = NULL;
 
 extern "C" {
   EMSCRIPTEN_KEEPALIVE uint8_t *init_in(size_t bytes) {
@@ -31,6 +32,7 @@ extern "C" {
   }
 
   EMSCRIPTEN_KEEPALIVE void set_mode(int mode) {
+    g_mode = mode;
     if (demodulator) delete demodulator;
     switch (mode)
     {
@@ -51,8 +53,19 @@ extern "C" {
       break;
     
     default:
+      demodulator = new Demodulator_WBFM(SAMPLERATE, AUDIO_SAMPLERATE);
       break;
     }
+  }
+
+  EMSCRIPTEN_KEEPALIVE void set_samplerate(double rate) {
+    SAMPLERATE = rate;
+    if (demodulator) set_mode(g_mode);
+  }
+
+  EMSCRIPTEN_KEEPALIVE void set_audio_samplerate(double rate) {
+    AUDIO_SAMPLERATE = rate;
+    if (demodulator) set_mode(g_mode);
   }
 
   EMSCRIPTEN_KEEPALIVE size_t process(double freqOffset) {
@@ -60,5 +73,9 @@ extern "C" {
     iqSamplesFromUint8(in, IQ[0], IQ[1]);
     shiftFrequency(IQ, freqOffset, SAMPLERATE, cosine, sine);
     return demodulator->process(IQ[0], IQ[1], out_left, out_right);
+  }
+
+  EMSCRIPTEN_KEEPALIVE double get_signal_level() {
+    return demodulator->getRelSignalLevel();
   }
 }
