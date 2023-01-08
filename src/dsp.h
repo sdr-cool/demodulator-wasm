@@ -5,15 +5,15 @@
 #include <cstdint>
 #include <vector>
 
-#include <iostream>
-template<class ITER> void debug_view(ITER begin, size_t len = 8) {
-  auto end = begin + len;
-  while (begin != end)
-  {
-    std::cout << *begin++ << " ";
-  }
-  std::cout << std::endl;
-}
+// #include <iostream>
+// template<class ITER> void debug_view(ITER begin, size_t len = 8) {
+//   auto end = begin + len;
+//   while (begin != end)
+//   {
+//     std::cout << *begin++ << " ";
+//   }
+//   std::cout << std::endl;
+// }
 
 class Demodulator {
 public:
@@ -34,13 +34,11 @@ inline void iqSamplesFromUint8(const std::vector<uint8_t>& buffer, std::vector<f
   }
 }
 
-inline void shiftFrequency(std::vector<float> *IQ, size_t freq, size_t sampleRate, double &cosine, double &sine) {
+inline void shiftFrequency(std::vector<float> *IQ, double freq, double sampleRate, double &cosine, double &sine) {
   double deltaCos = cos(freq * 2.0 * M_PI / sampleRate);
   double deltaSin = sin(freq * 2.0 * M_PI / sampleRate);
   std::vector<float> &I = IQ[0];
   std::vector<float> &Q = IQ[1];
-  // var oI = new Float32Array(I.length);
-  // var oQ = new Float32Array(Q.length);
   for (int i = 0; i < I.size(); ++i) {
     float ii = I[i];
     float qi = Q[i];
@@ -89,31 +87,28 @@ public:
 
 class Downsampler {
 private:
-  FIRFilter filter;// = new FIRFilter(coefficients);
-  double rateMul; // = inRate / outRate;
+  FIRFilter filter;
+  double rateMul;
 
 public:
-  Downsampler(size_t inRate, size_t outRate, const std::vector<float>& coefficients):
-    filter(coefficients), rateMul(double(inRate) / double(outRate))
+  Downsampler(double inRate, double outRate, const std::vector<float>& coefficients):
+    filter(coefficients), rateMul(inRate / outRate)
   {
   }
 
   void downsample(const std::vector<float>& samples, std::vector<float> &outArr) {
-    // debug_view(samples.begin());
-
     filter.loadSamples(samples);
     outArr.resize(samples.size() / rateMul);
     double readFrom = 0.0;
     for (int i = 0; i < outArr.size(); ++i, readFrom += rateMul) {
       outArr[i] = filter.get(size_t(readFrom));
     }
-    // debug_view(outArr.begin());
   }
 };
 
-std::vector<float> getLowPassFIRCoeffs(size_t sampleRate, size_t halfAmplFreq, size_t length) {
+std::vector<float> getLowPassFIRCoeffs(double sampleRate, double halfAmplFreq, size_t length) {
   length += (length + 1) % 2;
-  double freq = double(halfAmplFreq) / double(sampleRate);
+  double freq = halfAmplFreq / sampleRate;
   std::vector<float> coefs(length);
   size_t center = length / 2;
   double sum = 0;

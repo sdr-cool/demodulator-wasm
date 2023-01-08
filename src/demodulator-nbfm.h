@@ -15,8 +15,8 @@ private:
   double relSignalPower;
 
 public:
-  FMDemodulator(size_t inRate, size_t outRate, size_t maxF, size_t filterFreq, size_t kernelLen)
-    : AMPL_CONV(double(outRate) / (2 * M_PI * maxF)),
+  FMDemodulator(double inRate, double outRate, double maxF, double filterFreq, size_t kernelLen)
+    : AMPL_CONV(outRate / (2 * M_PI * maxF)),
       coefs(getLowPassFIRCoeffs(inRate, filterFreq, kernelLen)),
       downsamplerI(inRate, outRate, coefs),
       downsamplerQ(inRate, outRate, coefs),
@@ -79,17 +79,17 @@ public:
 
 class Demodulator_NBFM: public Demodulator {
 private:
-  size_t multiple;
-  size_t interRate;
-  size_t filterF;
+  double multiple;
+  double interRate;
+  double filterF;
 
   FMDemodulator demodulator;
   std::vector<float> filterCoefs;
   Downsampler downSampler;
 
 public:
-  Demodulator_NBFM(size_t inRate, size_t outRate, size_t maxF)
-    : multiple(1 + floor((double(maxF) - 1) * 7 / 75000)),
+  Demodulator_NBFM(double inRate, double outRate, double maxF)
+    : multiple(1 + floor((maxF - 1) * 7 / 75000)),
       interRate(48000 * multiple),
       filterF(maxF * 0.8),
       demodulator(inRate, interRate, maxF, filterF, 50 * 7 / multiple),

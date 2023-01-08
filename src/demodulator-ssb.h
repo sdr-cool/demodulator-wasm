@@ -20,7 +20,7 @@ private:
   double relSignalPower;
 
 public:
-  SSBDemodulator(size_t inRate, size_t outRate, size_t filterFreq, bool upper, size_t kernelLen)
+  SSBDemodulator(double inRate, double outRate, double filterFreq, bool upper, size_t kernelLen)
     : coefs(getLowPassFIRCoeffs(inRate, 10000, kernelLen)),
       downsamplerI(inRate, outRate, coefs),
       downsamplerQ(inRate, outRate, coefs),
@@ -86,13 +86,13 @@ public:
 
 class Demodulator_SSB: public Demodulator {
 private:
-  const size_t INTER_RATE = 48000;
+  const double INTER_RATE = 48000;
   SSBDemodulator demodulator;
   std::vector<float> filterCoefs;
   Downsampler downSampler;
 
 public:
-  Demodulator_SSB(size_t inRate, size_t outRate, size_t bandwidth, bool upper)
+  Demodulator_SSB(double inRate, double outRate, double bandwidth, bool upper)
     : demodulator(inRate, INTER_RATE, bandwidth, upper, 151),
       filterCoefs(getLowPassFIRCoeffs(INTER_RATE, 10000, 41)),
       downSampler(INTER_RATE, outRate, filterCoefs)

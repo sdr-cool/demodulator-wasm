@@ -6,8 +6,8 @@
 #include "demodulator-am.h"
 #include "demodulator-ssb.h"
 
-size_t SAMPLERATE = 1024 * 1e3;
-size_t AUDIO_SAMPLERATE = 48 * 1e3;
+double SAMPLERATE = 1024 * 1e3;
+double AUDIO_SAMPLERATE = 48 * 1e3;
 
 std::vector<uint8_t> in;
 std::vector<float> out_left;
@@ -55,7 +55,7 @@ extern "C" {
     }
   }
 
-  EMSCRIPTEN_KEEPALIVE size_t process(size_t freqOffset) {
+  EMSCRIPTEN_KEEPALIVE size_t process(double freqOffset) {
     std::vector<float> IQ[2];
     iqSamplesFromUint8(in, IQ[0], IQ[1]);
     shiftFrequency(IQ, freqOffset, SAMPLERATE, cosine, sine);

@@ -12,11 +12,11 @@ private:
   double relSignalPower;
 
 public:
-  AMDemodulator(size_t inRate, size_t outRate, size_t filterFreq, size_t kernelLen)
+  AMDemodulator(double inRate, double outRate, double filterFreq, size_t kernelLen)
     : coefs(getLowPassFIRCoeffs(inRate, filterFreq, kernelLen)),
       downsamplerI(inRate, outRate, coefs),
       downsamplerQ(inRate, outRate, coefs),
-      sigRatio(double(inRate) / double(outRate)),
+      sigRatio(inRate / outRate),
       relSignalPower(0)
   {
   }
@@ -61,14 +61,14 @@ public:
 
 class Demodulator_AM: public Demodulator {
 private:
-  const size_t INTER_RATE = 48000;
-  size_t filterF;
+  const double INTER_RATE = 48000;
+  double filterF;
   AMDemodulator demodulator;
   std::vector<float> filterCoefs;
   Downsampler downSampler;
 
 public:
-  Demodulator_AM(size_t inRate, size_t outRate, size_t bandwidth)
+  Demodulator_AM(double inRate, double outRate, double bandwidth)
     : filterF(bandwidth / 2),
       demodulator(inRate, INTER_RATE, filterF, 351),
       filterCoefs(getLowPassFIRCoeffs(INTER_RATE, 10000, 41)),
@@ -86,5 +86,4 @@ public:
   virtual double getRelSignalLevel() {
     return pow(demodulator.getRelSignalPower(), 0.17);
   }
-
 };

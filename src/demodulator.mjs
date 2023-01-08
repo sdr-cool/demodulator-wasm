@@ -22,9 +22,9 @@ export default {
     return modeMap[mode] >= 0
   },
 
-  demodulate(buffer) {
+  demodulate(buffer, freqOffset = 0) {
     bufferToPtr(buffer)
-    const outLen = demodulator._process(buffer.byteLength)
+    const outLen = demodulator._process(freqOffset)
 
     const left = ptrToBuffer(demodulator._get_left(), outLen * 4)
     const right = ptrToBuffer(demodulator._get_right(), outLen * 4)
