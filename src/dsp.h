@@ -35,6 +35,8 @@ inline void iqSamplesFromUint8(const std::vector<uint8_t>& buffer, std::vector<f
 }
 
 inline void shiftFrequency(std::vector<float> *IQ, double freq, double sampleRate, double &cosine, double &sine) {
+  if (freq > -.5 && freq < .5) return ;
+  
   double deltaCos = cos(freq * 2.0 * M_PI / sampleRate);
   double deltaSin = sin(freq * 2.0 * M_PI / sampleRate);
   std::vector<float> &I = IQ[0];
