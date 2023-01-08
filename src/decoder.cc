@@ -58,13 +58,9 @@ extern "C" {
     }
   }
 
-  EMSCRIPTEN_KEEPALIVE void set_samplerate(double rate) {
-    SAMPLERATE = rate;
-    if (demodulator) set_mode(g_mode);
-  }
-
-  EMSCRIPTEN_KEEPALIVE void set_audio_samplerate(double rate) {
-    AUDIO_SAMPLERATE = rate;
+  EMSCRIPTEN_KEEPALIVE void set_samplerate(double samplerate, double audio_samplerate) {
+    if (samplerate >= 1e5) SAMPLERATE = samplerate;
+    if (audio_samplerate >= 1e3) AUDIO_SAMPLERATE = audio_samplerate;
     if (demodulator) set_mode(g_mode);
   }
 

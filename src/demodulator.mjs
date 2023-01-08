@@ -22,6 +22,10 @@ export default {
     return modeMap[mode] >= 0
   },
 
+  setRate(samplerate = 0, audioSamplerate = 0) {
+    demodulator._set_samplerate(samplerate, audioSamplerate);
+  },
+
   demodulate(buffer, freqOffset = 0) {
     bufferToPtr(buffer)
     const outLen = demodulator._process(freqOffset)
