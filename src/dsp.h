@@ -170,3 +170,9 @@ public:
     return std;
   }
 };
+
+double average(const std::vector<float> &arr) {
+  double sum = 0;
+  for (auto it = arr.begin(); it != arr.end(); ++it) sum += *it;
+  return sum / arr.size();
+}

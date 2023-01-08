@@ -21,12 +21,12 @@ async function play() {
   const sdr = await RtlSdr.requestDevice()
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(SAMPLE_RATE)
-  await sdr.setCenterFrequency(436.65 * 1e6)
+  await sdr.setCenterFrequency(136 * 1e6)
   await sdr.resetBuffer()
 
   const decoder = new Decoder()
-  decoder.setMode('USB');
-  decoderWasm.setMode('USB');
+  decoder.setMode('AM');
+  decoderWasm.setMode('AM');
   while (sdr) {
     const samples = await sdr.readSamples(SAMPLES_PER_BUF)
     setImmediate(() => {

@@ -1,6 +1,7 @@
 #include <emscripten.h>
 
 #include "dsp.h"
+#include "demodulator-am.h"
 #include "demodulator-ssb.h"
 
 size_t SAMPLERATE = 1024 * 1e3;
@@ -31,6 +32,9 @@ extern "C" {
     if (demodulator) delete demodulator;
     switch (mode)
     {
+    case 2:
+      demodulator = new Demodulator_AM(SAMPLERATE, AUDIO_SAMPLERATE, 6000);
+      break;
     case 3:
       demodulator = new Demodulator_SSB(SAMPLERATE, AUDIO_SAMPLERATE, 2700, true);
       break;

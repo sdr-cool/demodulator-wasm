@@ -1,6 +1,6 @@
 #pragma once
 
-#include<algorithm>
+#include <algorithm>
 #include "dsp.h"
 
 class SSBDemodulator {
@@ -105,8 +105,7 @@ public:
   virtual size_t process(const std::vector<float> &samplesI, const std::vector<float> &samplesQ, std::vector<float> &left, std::vector<float> &right) {
     std::vector<float> demodulated = demodulator.demodulateTuned(samplesI, samplesQ);
     downSampler.downsample(demodulated, left);
-    right.resize(left.size());
-    right.assign(left.begin(), left.end());
+    right = left;
     return left.size();
   }
 
