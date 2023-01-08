@@ -18,7 +18,7 @@
 class Demodulator {
 public:
   virtual ~Demodulator() {}
-  virtual size_t process(const std::vector<float> &I, const std::vector<float> &Q, std::vector<float> &left, std::vector<float> &right) = 0;
+  virtual size_t demodulate(const std::vector<float> &I, const std::vector<float> &Q, std::vector<float> &left, std::vector<float> &right) = 0;
   virtual double getRelSignalLevel() = 0;
 };
 

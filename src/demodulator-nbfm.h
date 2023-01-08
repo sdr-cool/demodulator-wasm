@@ -98,7 +98,7 @@ public:
   {
   }
 
-  virtual size_t process(const std::vector<float> &samplesI, const std::vector<float> &samplesQ, std::vector<float> &left, std::vector<float> &right) {
+  virtual size_t demodulate(const std::vector<float> &samplesI, const std::vector<float> &samplesQ, std::vector<float> &left, std::vector<float> &right) {
     std::vector<float> demodulated = demodulator.demodulateTuned(samplesI, samplesQ);
     downSampler.downsample(demodulated, left);
     right = left;

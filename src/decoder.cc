@@ -68,7 +68,7 @@ extern "C" {
     std::vector<float> IQ[2];
     iqSamplesFromUint8(in, IQ[0], IQ[1]);
     shiftFrequency(IQ, freqOffset, SAMPLERATE, cosine, sine);
-    return demodulator->process(IQ[0], IQ[1], out_left, out_right);
+    return demodulator->demodulate(IQ[0], IQ[1], out_left, out_right);
   }
 
   EMSCRIPTEN_KEEPALIVE double get_signal_level() {

@@ -2,7 +2,7 @@ import { strict as assert } from 'node:assert';
 
 import RtlSdr from 'rtlsdrjs'
 import Decoder from './decode-worker.mjs'
-import decoderWasm from '../src/demodulator.mjs'
+import decoderWasm from '../src/decoder.mjs'
 
 const SAMPLE_RATE = 1024 * 1e3 // Must be a multiple of 512 * BUFS_PER_SEC
 const BUFS_PER_SEC = 5
