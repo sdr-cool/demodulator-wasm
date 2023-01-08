@@ -66,10 +66,11 @@ public:
   }
 
   void loadSamples(const std::vector<float>& samples) {
-    std::vector<float> newSamples(samples.size() + offset);
-    newSamples.assign(curSamples.begin() + curSamples.size() - offset, curSamples.end());
-    std::copy(samples.begin(), samples.end(), newSamples.begin() + offset);
-    curSamples = newSamples;
+    size_t sub_start = curSamples.size() - offset;
+    size_t sub_end = curSamples.size();
+    curSamples.resize(samples.size() + offset);
+    std::copy(curSamples.begin() + sub_start, curSamples.begin() + sub_end, curSamples.begin());
+    std::copy(samples.begin(), samples.end(), curSamples.begin() + offset);
   }
 
   double get(size_t index) {
