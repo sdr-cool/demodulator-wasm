@@ -1,3 +1,3 @@
-import Decoder from './src/decode-worker.mjs'
+import decoder from './src/decoder.mjs'
 
-export default Decoder
+export default decoder
