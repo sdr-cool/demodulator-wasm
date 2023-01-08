@@ -1,6 +1,7 @@
 #include <emscripten.h>
 
 #include "dsp.h"
+#include "demodulator-nbfm.h"
 #include "demodulator-am.h"
 #include "demodulator-ssb.h"
 
@@ -32,6 +33,9 @@ extern "C" {
     if (demodulator) delete demodulator;
     switch (mode)
     {
+    case 1:
+      demodulator = new Demodulator_NBFM(SAMPLERATE, AUDIO_SAMPLERATE, 10000); // 12500
+      break;
     case 2:
       demodulator = new Demodulator_AM(SAMPLERATE, AUDIO_SAMPLERATE, 6000);
       break;
