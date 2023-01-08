@@ -12,13 +12,13 @@ async function test() {
   const sdr = await RtlSdr.requestDevice()
   await sdr.open({ ppm: 0.5 })
   await sdr.setSampleRate(SAMPLE_RATE)
-  await sdr.setCenterFrequency(88.7 * 1e6)
+  await sdr.setCenterFrequency(97.4 * 1e6)
   await sdr.resetBuffer()
 
   const decoder = new Decoder()
   for (const mode of ['FM', 'NFM', 'AM', 'LSB', 'USB']) {
     decoder.setMode(mode)
-    if (decoderWasm.hasMode(mode)) decoderWasm.setMode(mode)
+    decoderWasm.setMode(mode)
 
     let dataProcessed = 0
     let costDecoder = 0
@@ -27,11 +27,9 @@ async function test() {
       const samples = await sdr.readSamples(SAMPLES_PER_BUF)
       dataProcessed += samples.byteLength
 
-      if (decoderWasm.hasMode(mode)) {
-        const dsw = Date.now()
-        decoderWasm.demodulate(samples, true, 0)
-        costDecoderWasm += Date.now() - dsw
-      }
+      const dsw = Date.now()
+      const [leftW, rightW, slW] = decoderWasm.demodulate(samples, true, 0)
+      costDecoderWasm += Date.now() - dsw
 
       const ds = Date.now()
       const [left, right, sl] = decoder.process(samples, true, 0)
