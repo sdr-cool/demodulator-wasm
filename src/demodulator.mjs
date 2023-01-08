@@ -12,7 +12,7 @@ function ptrToBuffer(ptr, bytes) {
   return out
 }
 
-const modeMap = { 'NFM': 1, 'AM': 2, 'USB': 3, 'LSB': 4 }
+const modeMap = { 'FM': 0, 'NFM': 1, 'AM': 2, 'USB': 3, 'LSB': 4 }
 export default {
   setMode(mode) {
     demodulator._set_mode(modeMap[mode])
