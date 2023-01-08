@@ -32,7 +32,8 @@ export default {
 
     const left = ptrToBuffer(demodulator._get_left(), outLen * 4)
     const right = ptrToBuffer(demodulator._get_right(), outLen * 4)
+    const sl = demodulator._get_signal_level()
 
-    return [left, right]
+    return [left, right, sl]
   }
 }
