@@ -1,4 +1,6 @@
-import { default  as demodulator } from './demodulator_wasm.js'
+import importWasm from './demodulator_wasm.mjs'
+let demodulator = null
+importWasm().then(r => demodulator = r)
 
 function bufferToPtr(buffer) {
   const ptr = demodulator._init_in(buffer.byteLength)
@@ -23,7 +25,7 @@ export default {
   },
 
   setRate(samplerate = 0, audioSamplerate = 0) {
-    demodulator._set_samplerate(samplerate, audioSamplerate);
+    demodulator._set_samplerate(samplerate, audioSamplerate)
   },
 
   demodulate(buffer, freqOffset = 0) {
