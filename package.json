@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/sdr-cool/demodulator-wasm#readme",
   "devDependencies": {
-    "rtlsdrjs": "^0.0.0"
+    "@sdr.cool/rtlsdrjs": "^0.1.0"
   }
 }
