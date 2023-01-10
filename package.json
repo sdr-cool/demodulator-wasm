@@ -1,6 +1,6 @@
 {
   "name": "@sdr.cool/demodulator-wasm",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Was demodulator for sdr.",
   "main": "index.mjs",
   "directories": {
